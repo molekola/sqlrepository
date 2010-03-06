@@ -1,0 +1,8 @@
+jndiKey=java:comp/env
+jdbcKey=jdbc/pfemminile
+loggerKey=it.rcs.mediacenter
+sqlRepository=/WEB-INF/classes
+checkSQLFileReload=true
+setAutocommit=true
+autocommit=false
+test.query=SELECT SYSDATE FROM DUAL
