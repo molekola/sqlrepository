@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>it.treis</groupId>
   <artifactId>sqlrepository</artifactId>
-  <version>1</version>
+  <version>1.0.1</version>
   <name>SQLRepository</name>
   <dependencies>
 	<dependency>
@@ -46,4 +46,15 @@
 		<version>1.2.12</version>
 	</dependency>
   </dependencies>
+  <build>
+	<plugins>
+		<plugin>
+			<artifactId>maven-compiler-plugin</artifactId> 
+			<configuration>
+				<source>1.6</source>
+				<target>1.6</target>
+			</configuration>
+		</plugin>
+	</plugins>
+  </build>
 </project>
