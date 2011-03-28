@@ -1172,7 +1172,9 @@ public class DataLink {
 	/**
 	 * Restituisco un object, per la colonna corrente */
 	private Object populateField(int columnType, int columnIndex, ResultSet rSet) throws SQLException {
+		
 		ResultSetMetaData meta = rSet.getMetaData();
+		
 		switch (columnType) {
 			case java.sql.Types.CHAR :
 			case java.sql.Types.VARCHAR :
@@ -1186,8 +1188,9 @@ public class DataLink {
 				if (ts != null)
 					return new java.util.Date(ts.getTime());
 				break;
-			case java.sql.Types.BIGINT :					
+			case java.sql.Types.BIGINT :
 				return new Long(rSet.getLong(columnIndex));
+			case java.sql.Types.DECIMAL :
 			case java.sql.Types.INTEGER :
 			case java.sql.Types.NUMERIC :
 				Object o = rSet.getObject(columnIndex);
@@ -1202,9 +1205,12 @@ public class DataLink {
 				return b;
 			default :
 				Object obj = rSet.getObject(columnIndex);
+				
 				sysLog.info("Tipo dato sconosciuto: "
-						+"[database: "+ columnType
-						+ ", java: " + obj.getClass().getName()+"]");
+						+"[column: "+ meta.getColumnName(columnIndex)
+						+", database type: "+ columnType
+						+ ", java: " + (obj!=null?obj.getClass().getName():"null") +"]");
+				
 				return obj;
 		}
 		
