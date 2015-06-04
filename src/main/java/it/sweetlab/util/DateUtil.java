@@ -192,13 +192,13 @@ public class DateUtil  extends Object {
   }
 
 	/**
-	 * Metodo che effettua il controllo sulla validità di una data.
+	 * Metodo che effettua il controllo sulla validita' di una data.
 	 * 
 	 * @param date
 	 *            La data da controllare
 	 * @param format
 	 *            Il formato applicato alla data
-	 * @return boolean Ritorna la validità della data
+	 * @return boolean Ritorna la validita' della data
 	 */
 	public static boolean isDate(String date, String format) {
 		try {
@@ -214,13 +214,13 @@ public class DateUtil  extends Object {
 	}
 
 	/**
-	 * Metodo che effettua il controllo sulla validità di una data.
+	 * Metodo che effettua il controllo sulla validita' di una data.
 	 * 
 	 * @param date
 	 *            La data da controllare
 	 * @param format
 	 *            Il formato applicato alla data
-	 * @return boolean Ritorna la validità della data
+	 * @return boolean Ritorna la validita' della data
 	 */
 	public static boolean isNotDate(String date, String format) {
 		return !isDate(date, format);

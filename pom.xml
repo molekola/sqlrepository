@@ -2,13 +2,14 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>it.treis</groupId>
   <artifactId>sqlrepository</artifactId>
-  <version>1.0.1</version>
+  <packaging>jar</packaging>
+  <version>1.1.0.b</version>
   <name>SQLRepository</name>
   <dependencies>
 	<dependency>
 		<groupId>com.oracle</groupId>
 		<artifactId>ojdbc14</artifactId>
-		<version>10.2.0.4</version>
+		<version>10.2.0.5</version>
 	</dependency>
 	<dependency>
 		<groupId>commons-io</groupId>
