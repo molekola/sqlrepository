@@ -3,11 +3,12 @@ package it.sweetlab.db;
 public class DCClob {
 
 
-    private String str;
+    private final String str;
 
     /**
      * Costruttore della classe che imposta il valore
      * alla variabile privata str
+	 * @param str
      */
     public DCClob(String str) {
         this.str = str;
@@ -22,4 +23,8 @@ public class DCClob {
         return str;
     }
 
+	public char[] getCharArray() {
+		if (str == null) return null;
+		return str.toCharArray();
+	}
 }

@@ -4,8 +4,8 @@ import it.sweetlab.data.DataContainer;
 import it.sweetlab.db.repository.Query;
 import it.sweetlab.util.DateUtil;
 import it.sweetlab.util.TextUtils;
-
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Blob;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -21,18 +21,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-
-import oracle.jdbc.OracleCallableStatement;
-import oracle.jdbc.OracleTypes;
-import oracle.sql.BLOB;
-import oracle.sql.CLOB;
-import oracle.sql.RAW;
-
+import javax.sql.rowset.serial.SerialBlob;
+import javax.sql.rowset.serial.SerialClob;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -469,7 +463,7 @@ public class DataLink {
 				case RETURN_TYPE_HASH :
 					callableStatement.registerOutParameter(
 						parameterIndex,
-						OracleTypes.CURSOR
+						Types.REF_CURSOR
 					);
 					break;
 			}
@@ -490,50 +484,40 @@ public class DataLink {
 				 * (es immagini digitali). */
 			} else if (paramIn instanceof byte[]) {
 				byte[] byteArray = (byte[]) paramIn;
-				callableStatement.setObject(parameterIndex, new RAW(byteArray));
+				callableStatement.setObject(parameterIndex, new String(byteArray));
 			} else if (paramIn instanceof Integer) {
 				Integer integer = (Integer) paramIn;
-				callableStatement.setInt(parameterIndex, integer.intValue());
+				callableStatement.setInt(parameterIndex, integer);
 			} else if (paramIn instanceof Long) {
 				Long value = (Long) paramIn;
-				callableStatement.setLong(parameterIndex, value.longValue());
+				callableStatement.setLong(parameterIndex, value);
 			} else if (paramIn instanceof Short) {
 				Short value = (Short) paramIn;
-				callableStatement.setShort(parameterIndex, value.shortValue());
+				callableStatement.setShort(parameterIndex, value);
 			} else if (paramIn instanceof Double) {
 				Double value = (Double) paramIn;
-				callableStatement.setDouble(parameterIndex, value.doubleValue());
+				callableStatement.setDouble(parameterIndex, value);
 			} else if (paramIn instanceof java.util.Date) {
 				java.sql.Date value = new java.sql.Date(((java.util.Date) paramIn).getTime());
 				callableStatement.setDate(parameterIndex, value);
 			} else if (paramIn instanceof Float) {
 				Float value = (Float) paramIn;
-				callableStatement.setFloat(parameterIndex, value.floatValue());
+				callableStatement.setFloat(parameterIndex, value);
 				/* Tipo dati Blob (Binary Large Object) per memorizzare una 
 				 * grande quantita' di dati come semplici bytes.
 				 * La classe DCBlob.java viene utilizzata per traformare il BLOB
 				 * in un oggetto di tipo array di byte gestibile da codice java */
 			} else if (paramIn instanceof DCBlob) {
 				DCBlob value = (DCBlob) paramIn;
-				BLOB oraBlob = BLOB.createTemporary(con, true, BLOB.DURATION_SESSION);
-				byte[] bytes = value.getBytes();
-				oraBlob.putBytes(1, bytes);
-				((OracleCallableStatement) callableStatement).setBLOB(
-					parameterIndex,
-					oraBlob
-				);
+				Blob oraBlob = new SerialBlob(value.getBytes());
+				callableStatement.setBlob(parameterIndex, oraBlob);
 				/* Tipo dati Clob(Character Large Object) per memorizzare una 
 				 * grande quantita' di dati espressi in caratteri.
 				 * La classe DCClob.java viene utilizzata per traformare il CLOB 
 				 * in un oggetto di tipo String gestibile da codice java */
 			} else if (paramIn instanceof DCClob) {
 				DCClob value = (DCClob) paramIn;
-				CLOB oraClob =
-					CLOB.createTemporary(con, true, CLOB.DURATION_SESSION);
-				oraClob.putString(1, value.getString());
-				((OracleCallableStatement) callableStatement).setCLOB(
-					parameterIndex,
-					oraClob);
+				callableStatement.setClob(parameterIndex, new SerialClob(value.getCharArray()));
 			}
 		}
 		// Istruzione per eseguire la procedura con i parametri specificati.
@@ -577,9 +561,11 @@ public class DataLink {
 
 	/**
 	 * Esegue una Query SQL parametrica, partendo da un oggetto 
+	 * @return 
+	 * @throws java.sql.SQLException
 	 * 		@see it.sweetlab.db.Query
 	 * Parametri:
-	 * 		@param Query : Oggetto che contiene la stringa SQL e i parametri. */
+	 * 		@param q : Oggetto che contiene la stringa SQL e i parametri. */
 	public DataContainer execQuery(Query q) throws SQLException {
 		String sql = q.getSql();
 		List params = q.getParameters();
