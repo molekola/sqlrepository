@@ -5,12 +5,10 @@
   <packaging>jar</packaging>
   <version>1.1.0.b</version>
   <name>SQLRepository</name>
+  <properties>
+	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
   <dependencies>
-	<!-- <dependency>
-		<groupId>com.oracle</groupId>
-		<artifactId>ojdbc14</artifactId>
-		<version>10.2.0.5</version>
-	</dependency> -->
 	<dependency>
 		<groupId>commons-io</groupId>
 		<artifactId>commons-io</artifactId>
@@ -52,8 +50,8 @@
 		<plugin>
 			<artifactId>maven-compiler-plugin</artifactId> 
 			<configuration>
-				<source>1.6</source>
-				<target>1.6</target>
+				<source>1.7</source>
+				<target>1.7</target>
 			</configuration>
 		</plugin>
 	</plugins>

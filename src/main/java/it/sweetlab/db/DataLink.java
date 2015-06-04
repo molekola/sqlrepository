@@ -464,7 +464,7 @@ public class DataLink {
 				case RETURN_TYPE_HASH :
 					callableStatement.registerOutParameter(
 						parameterIndex,
-						Types.REF_CURSOR
+						2012 // Types.REF_CURSOR
 					);
 					break;
 			}
