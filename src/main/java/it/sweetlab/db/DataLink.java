@@ -433,6 +433,7 @@ public class DataLink {
 	* @return Object       E' il risultato dell'esecuzione della query PL/SQL.
 	*                      Esso puo' anche assumere come valore "null" qualora
 	*                      sia stata eseguita una stored procedure.
+	* @throws java.sql.SQLException
 	*/
 	public Object execOPLSQL(
 		int returnType,
@@ -440,7 +441,7 @@ public class DataLink {
 		List parameters
 	) throws SQLException {
 		Object result = null;
-		CallableStatement callableStatement = null;
+		CallableStatement callableStatement;
 		int parameterIndex = 0;
 
 		if (returnType == RETURN_TYPE_VOID) {
@@ -473,15 +474,14 @@ public class DataLink {
 		 * execPLSQL.
 		 * In questo caso bisogna verificare il tipo di parametro paasato per 
 		 * settarlo correttamente */
-		for (int i = 0; i < parameters.size(); i++) {
-	
+		for (Object parameter : parameters) {
 			parameterIndex++;
-			Object paramIn = parameters.get(i);
+			Object paramIn = parameter;
 			if (paramIn instanceof String) {
 				String string = (String) paramIn;
 				callableStatement.setString(parameterIndex, string);
-				/* Raw e' un tipo di dato utilizzato per memorizzare dati binari 
-				 * (es immagini digitali). */
+				/* Raw e' un tipo di dato utilizzato per memorizzare dati binari
+				* (es immagini digitali). */
 			} else if (paramIn instanceof byte[]) {
 				byte[] byteArray = (byte[]) paramIn;
 				callableStatement.setObject(parameterIndex, new String(byteArray));
@@ -503,18 +503,18 @@ public class DataLink {
 			} else if (paramIn instanceof Float) {
 				Float value = (Float) paramIn;
 				callableStatement.setFloat(parameterIndex, value);
-				/* Tipo dati Blob (Binary Large Object) per memorizzare una 
-				 * grande quantita' di dati come semplici bytes.
-				 * La classe DCBlob.java viene utilizzata per traformare il BLOB
-				 * in un oggetto di tipo array di byte gestibile da codice java */
+				/* Tipo dati Blob (Binary Large Object) per memorizzare una
+				* grande quantita' di dati come semplici bytes.
+				* La classe DCBlob.java viene utilizzata per traformare il BLOB
+				* in un oggetto di tipo array di byte gestibile da codice java */
 			} else if (paramIn instanceof DCBlob) {
 				DCBlob value = (DCBlob) paramIn;
 				Blob oraBlob = new SerialBlob(value.getBytes());
 				callableStatement.setBlob(parameterIndex, oraBlob);
-				/* Tipo dati Clob(Character Large Object) per memorizzare una 
-				 * grande quantita' di dati espressi in caratteri.
-				 * La classe DCClob.java viene utilizzata per traformare il CLOB 
-				 * in un oggetto di tipo String gestibile da codice java */
+				/* Tipo dati Clob(Character Large Object) per memorizzare una
+				* grande quantita' di dati espressi in caratteri.
+				* La classe DCClob.java viene utilizzata per traformare il CLOB
+				* in un oggetto di tipo String gestibile da codice java */
 			} else if (paramIn instanceof DCClob) {
 				DCClob value = (DCClob) paramIn;
 				callableStatement.setClob(parameterIndex, new SerialClob(value.getCharArray()));
@@ -575,9 +575,11 @@ public class DataLink {
 
 	/**
 	 * Esegue una Query SQL parametrica, partendo da un oggetto 
+	 * @return 
+	 * @throws java.sql.SQLException
 	 * 		@see it.sweetlab.db.Query
 	 * Parametri:
-	 * 		@param Query : Oggetto che contiene la stringa SQL e i parametri.
+	 * 		@param q : Oggetto che contiene la stringa SQL e i parametri.
 	 *		@param resultType: Tipo di risultato di ritorno 
 	 * @throws InvocationTargetException 
 	 * @throws IllegalAccessException 
@@ -591,12 +593,14 @@ public class DataLink {
 
 	/**
 	 * Esegue una Query SQL parametrica, partendo da un oggetto 
+	 * @return 
+	 * @throws java.sql.SQLException
 	 * 		@see it.sweetlab.db.Query
 	 * Parametri:
-	 * 		@param Query : Oggetto che contiene la stringa SQL e i parametri. 
+	 * 		@param q : Oggetto che contiene la stringa SQL e i parametri. 
 	 *		@param resultType: Tipo di risultato di ritorno
 	 * 		@param begin : Indice iniziale del resultSet da estrarre. 
-	 * 		@param begin : Indice finale del resultSet da estrarre. 
+	 * 		@param end : Indice finale del resultSet da estrarre. 
 	 * @throws InvocationTargetException 
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
@@ -610,11 +614,13 @@ public class DataLink {
 
     /**
 	 * Esegue una Query SQL parametrica, partendo da un oggetto 
+	 * @return 
+	 * @throws java.sql.SQLException
 	 * 		@see it.sweetlab.db.Query
 	 * Parametri:
-	 * 		@param Query : Oggetto che contiene la stringa SQL e i parametri. 
+	 * 		@param q : Oggetto che contiene la stringa SQL e i parametri. 
 	 * 		@param begin : Indice iniziale del resultSet da estrarre. 
-	 * 		@param begin : Indice finale del resultSet da estrarre. 
+	 * 		@param end : Indice finale del resultSet da estrarre. 
 	 * */
 	public DataContainer execQuery(Query q, int begin, int end) throws SQLException {
 		String sql = q.getSql();
@@ -626,6 +632,8 @@ public class DataLink {
 	/**
 	 * Esegue una query senza parametri
 	 * @param query : la query da eseguire.
+	 * @return 
+	 * @throws java.sql.SQLException
 	 * @Exception SQLException si verifica quando si tenta di utilizzare una
 	 * connessione nulla oppure quando si ha una SQLException */
 	public DataContainer execQuery(String query) throws SQLException {
@@ -664,6 +672,8 @@ public class DataLink {
 	 *      java.util.Date, 
 	 *      java.sql.Date, 
 	 *      java.sql.Timestamp
+	 * @return 
+	 * @throws java.sql.SQLException
 	 * @Exception SQLException si verifica quando si tenta di utilizzare una 
 	 * 		connessione nulla oppure quando si ha una SQLException
 	 */
@@ -689,6 +699,8 @@ public class DataLink {
 	 *      java.sql.Date, 
 	 *      java.sql.Timestamp
 	 * @param resultType: Il tipo di oggetto di ritorno 
+	 * @return  
+	 * @throws java.sql.SQLException 
 	 * @throws InvocationTargetException 
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
@@ -719,6 +731,8 @@ public class DataLink {
 	 * @param begin : Indice iniziale nel ResultSet.
 	 * @param resultType : Tipo risultato di ritorno.
 	 * @param end : Indice finale nel ResultSet .
+	 * @return 
+	 * @throws java.sql.SQLException
 	 * @throws InvocationTargetException 
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
@@ -759,6 +773,9 @@ public class DataLink {
 	 *      java.sql.Date, 
 	 *      java.sql.Timestamp
 	 * @param resultType: Il tipo di oggetto di ritorno 
+	 * @param fieldId 
+	 * @return  
+	 * @throws java.sql.SQLException 
 	 * @throws InvocationTargetException 
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
@@ -788,6 +805,8 @@ public class DataLink {
 	 *      java.sql.Timestamp
 	 * @param begin : Indice iniziale nel ResultSet.
 	 * @param end : Indice finale nel ResultSet .
+	 * @return 
+	 * @throws java.sql.SQLException 
 	 * @Exception SQLException si verifica quando si tenta di utilizzare una 
 	 * 		connessione nulla oppure quando si ha una SQLException
 	 */
@@ -822,13 +841,17 @@ public class DataLink {
 	}
 	
 	/** 
-	 * Esegue una query e restituisce il risultato sotto forma di lista del solo elemento presente nella colonna indicata in argomento. */
+	 * Esegue una query e restituisce il risultato sotto forma di lista del solo
+	 * elemento presente nella colonna indicata in argomento.
+	 * @param q
+	 * @param column
+	 * @return  The first column of the resultset */
 	public List<Object> execQueryToSingleColumn(Query q, String column){
 		if (StringUtils.isEmpty(column)) throw new NullPointerException("Column name could not be null.");
 		String sql = q.getSql();
 		List<Object> params = q.getParameters();
         sysLog = LogFactory.getLog(q.getClazz());
-		ResultSet rs = null;
+		ResultSet rs;
 		List<Object> result = new ArrayList<Object>();
 		try  {
 			rs = execBaseQuery(sql,params);
@@ -865,7 +888,8 @@ public class DataLink {
 	 * Esegue un comando SQL parametrico, partendo da un oggetto 
 	 * 		@see it.sweetlab.db.Query
 	 * Parametri:
-	 * 		@param Query : Oggetto che contiene la stringa SQL e i parametri. 
+	 * 		@param q : Oggetto che contiene la stringa SQL e i parametri. 
+	 * @throws java.sql.SQLException
 	 * */
 	public void execSQLStatement(Query q) throws SQLException {
 		String sql = q.getSql();
@@ -877,7 +901,7 @@ public class DataLink {
 	/**
 	 * Esegue un comando sql Insert,Update,Delete
 	 * @param query query  da eseguire
-	 * @Exception SQLException si verifica quando si tenta di utilizzare una
+	 * @throws SQLException si verifica quando si tenta di utilizzare una
 	 * connessione nulla oppure quando si ha una SQLException */
 	public void execSQLStatement(String query) throws SQLException {
 		sysLog.debug("   sql:\n" + query);
@@ -900,12 +924,12 @@ public class DataLink {
 	/**
 	 * Esegue un comando sql Insert,Update,Delete
 	 * 
-	 * @param query :
+	 * @param sql :
 	 *            query da eseguire
 	 * @param params :
 	 *            I parametri da passare. Accetta tipi: String, Double, Integer,
 	 *            java.util.Date, java.sql.Date, java.sql.Timestamp
-	 * @Exception SQLException
+	 * @throws SQLException
 	 *                si verifica quando si tenta di utilizzare una connessione
 	 *                nulla oppure quando si ha una SQLException
 	 */
@@ -923,6 +947,7 @@ public class DataLink {
 	public Connection getConnection() {
 		return con;
 	}
+	
 	/* Prelevo ResultSetMetaData che contiene la descrizione delle colonne del
 	 * ResultSet. 
 	 * L'idea e' di valorizzare con un valore differente da null il
@@ -946,9 +971,13 @@ public class DataLink {
 	/**
 	 * Restituisce un DataContainer di dati contenuti tra begin e end.
 	 * Serve per lavorare sulla paginazione.
+	 * @param rSet
 	 * @param begin indica un indice java standard, come quello di un array o di
 	 * una collection. Il primo elemento e' quindi 0. 
 	 * @param resultType: Tipo di risultato di ritorno
+	 * @param end final index
+	 * @return 
+	 * @throws java.sql.SQLException 
 	 * @throws InvocationTargetException 
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException */
@@ -1004,7 +1033,10 @@ public class DataLink {
 	 * L'idea e' di valorizzare con un valore differente da null il
 	 * DataContainer, in base al tipo della colonna sul DB. 
 	 * Si interrompe quando arriva alla fine del ResultSet o quando arrivato a 
-	 * 		@param limit. */
+	 * @param rSet
+	 * 		@param limit.
+	 * @return
+	 * @throws java.sql.SQLException  */
 	public DataContainer getDataContainer(ResultSet rSet, int limit)
 		throws SQLException {
 		ResultSetMetaData cols = rSet.getMetaData();
@@ -1026,10 +1058,13 @@ public class DataLink {
 		return result;
 	}
 	/**
-	 * Restituisce un DataContainer di dati contenuti tra begin e end.
-	 * Serve per lavorare sulla paginazione.
+	 * @param rSet
 	 * @param begin indica un indice java standard, come quello di un array o di
-	 * una collection. Il primo elemento e' quindi 0. */
+	 * una collection. Il primo elemento e' quindi 0.
+	 * @param end
+	 * @return Restituisce un DataContainer di dati contenuti tra begin e end.
+	 *			Serve per lavorare sulla paginazione.
+	 * @throws java.sql.SQLException */
 	public DataContainer getDataContainer(ResultSet rSet, int begin, int end)
 		throws SQLException {
 		/* Prelevo ResultSetMetaData che contiene la descrizione delle colonne 
@@ -1077,11 +1112,17 @@ public class DataLink {
 	}
 
 	/**
-	 * Prelevo ResultSetMetaData che contiene la descrizione delle colonne del
-	 * ResultSet. 
-	 * L'idea e' di valorizzare con un valore differente da null il
-	 * DataContainer, in base al tipo della colonna sul DB. 
-	 * @param resultType: Tipo di oggetto di ritorno*/
+	 * @param rSet
+	 * @param resultType: Tipo di oggetto di ritorno
+	 * @return Prelevo ResultSetMetaData che contiene la descrizione delle colonne del
+	 *			ResultSet. 
+	 *			L'idea e' di valorizzare con un valore differente da null il
+	 *			DataContainer, in base al tipo della colonna sul DB. 
+	 * @throws java.sql.SQLException
+	 * @throws java.lang.InstantiationException
+	 * @throws java.lang.IllegalAccessException
+	 * @throws java.lang.reflect.InvocationTargetException
+	 */
 	public List getResultList(ResultSet rSet, Class resultType) throws SQLException, InstantiationException, IllegalAccessException, InvocationTargetException {
 		ResultSetMetaData cols = rSet.getMetaData();
 		List result = new ArrayList();
@@ -1100,11 +1141,17 @@ public class DataLink {
 	}
 
 	/**
-	 * Prelevo ResultSetMetaData che contiene la descrizione delle colonne del
-	 * ResultSet. 
-	 * L'idea e' di valorizzare con un valore differente da null il
-	 * DataContainer, in base al tipo della colonna sul DB. 
-	 * @param resultType: Tipo di oggetto di ritorno*/
+	 * @param rSet
+	 * @param resultType: Tipo di oggetto di ritorno
+	 * @param fieldId
+	 * @return Prelevo ResultSetMetaData che contiene la descrizione delle colonne del
+	 *			ResultSet. 
+	 *			L'idea e' di valorizzare con un valore differente da null il
+	 *			DataContainer, in base al tipo della colonna sul DB. 
+	 * @throws java.sql.SQLException
+	 * @throws java.lang.IllegalAccessException
+	 * @throws java.lang.InstantiationException
+	 * @throws java.lang.reflect.InvocationTargetException*/
 	public Map getResultMap(ResultSet rSet, Class resultType, String fieldId) throws SQLException, InstantiationException, IllegalAccessException, InvocationTargetException {
 		ResultSetMetaData cols = rSet.getMetaData();
 		Map result = new HashMap();
@@ -1133,16 +1180,21 @@ public class DataLink {
     }
 	
 	/**
-     * Esegue una sequence e restituisce il valore successivo. 
-     * Testato e funzionante solo con Oracle. */
+     * @param sequenceName
+	 * @return Esegue una sequence e restituisce il valore successivo. 
+     *			Testato e funzionante solo con Oracle.
+	 * @throws java.sql.SQLException */
+	@Deprecated
     public int nextValue(String sequenceName) throws SQLException {
         String query = "SELECT "+sequenceName+".NEXTVAL FROM DUAL";
         return execCount(query);
     }
 	
 	/**
-	 * Estrae una query e restituisce una HashMap, con chiave 
-	 * @param columnDef 0 (default KEY) e come valore @param columnDef 1 (default value) */
+	 * @param q The Query to execute
+	 * @param columnDef 0 (default KEY) e come valore @param columnDef 1 (default value)
+	 * @return Estrae una query e restituisce una HashMap, con chiave 
+	 * @throws java.sql.SQLException */
 	public Map<String, Object> pivotQuery(Query q, String... columnDef) throws SQLException {
 		String columnKey   = columnDef.length > 0 ? columnDef[0] : "KEY";
 		String columnValue = columnDef.length > 1 ? columnDef[1] : "VALUE";
@@ -1175,7 +1227,7 @@ public class DataLink {
 					return new java.util.Date(ts.getTime());
 				break;
 			case java.sql.Types.BIGINT :
-				return new Long(rSet.getLong(columnIndex));
+				return rSet.getLong(columnIndex);
 			case java.sql.Types.DECIMAL :
 			case java.sql.Types.INTEGER :
 			case java.sql.Types.NUMERIC :
@@ -1183,9 +1235,9 @@ public class DataLink {
 				if (o == null)
 					return null;
 				else if (meta.getScale(columnIndex) > 0)
-					return new Double(rSet.getDouble(columnIndex));
+					return rSet.getDouble(columnIndex);
 				else // Restituisce 0 se e' null
-					return new Integer(rSet.getInt(columnIndex));
+					return rSet.getInt(columnIndex);
 			case java.sql.Types.BLOB :
 				Object b = rSet.getBlob(columnIndex);
 				return b;
@@ -1311,11 +1363,11 @@ public class DataLink {
 	      if (o instanceof java.lang.String){
 	        psQuery.setString(i, (String)o);
 	      } else if (o instanceof java.lang.Integer){
-	        psQuery.setInt(i, ((Integer)o).intValue());
+	        psQuery.setInt(i, ((Integer)o));
 	      } else if (o instanceof java.lang.Long){
-	        psQuery.setLong(i, ((Long)o).longValue());
+	        psQuery.setLong(i, ((Long)o));
 	      } else if (o instanceof java.lang.Double){
-	    	  psQuery.setDouble(i, ((Double)o).doubleValue());
+	    	  psQuery.setDouble(i, ((Double)o));
 		  } else if (o instanceof java.sql.Timestamp){
 			psQuery.setTimestamp(i, (Timestamp)o);
 	      } else if (o instanceof java.util.Date){
