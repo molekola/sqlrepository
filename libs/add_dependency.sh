@@ -3,6 +3,6 @@ mvn install:install-file \
   -DartifactId=ojdbc14 \
   -Dpackaging=jar \
   -Dversion=10.2.0.5 \
-  -Dfile= ojdbc14-10.2.0.5.jar \
+  -Dfile=ojdbc14-10.2.0.5.jar \
   -DgeneratePom=true
 
