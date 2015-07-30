@@ -5,6 +5,7 @@ import it.sweetlab.db.repository.Query;
 import it.sweetlab.util.DateUtil;
 import it.sweetlab.util.TextUtils;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -84,7 +85,9 @@ public class DataLink {
 	}
 
 	/** 
-     * Costruttore, Specifico le chiavi con cui referenziare la risorsa jndi. */
+     * Costruttore, Specifico le chiavi con cui referenziare la risorsa jndi.
+	 * @param jndiKey
+	 * @param dataSourceKey */
 	public DataLink(String jndiKey, String dataSourceKey) {
         if(resLog.isInfoEnabled()){
             resLog.info("JNDI_KEY:" + jndiKey);
@@ -1368,6 +1371,8 @@ public class DataLink {
 	        psQuery.setLong(i, ((Long)o));
 	      } else if (o instanceof java.lang.Double){
 	    	  psQuery.setDouble(i, ((Double)o));
+	      } else if (o instanceof BigDecimal){
+	        psQuery.setBigDecimal(i, ((BigDecimal)o));
 		  } else if (o instanceof java.sql.Timestamp){
 			psQuery.setTimestamp(i, (Timestamp)o);
 	      } else if (o instanceof java.util.Date){
