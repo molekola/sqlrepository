@@ -863,7 +863,7 @@ public class DataLink {
 			int colType = -1;
 			// Recupero i riferimenti alla colonna da estrarre.
 			for(int i = 1;i<=meta.getColumnCount();i++){
-				if (column.equalsIgnoreCase(meta.getColumnName(i))){
+				if (column.equalsIgnoreCase(meta.getColumnLabel(i))){
 					colIdx = i;
 					colType = meta.getColumnType(colIdx);
 					break;
@@ -1244,11 +1244,13 @@ public class DataLink {
 			case java.sql.Types.BLOB :
 				Object b = rSet.getBlob(columnIndex);
 				return b;
+			case java.sql.Types.BOOLEAN :
+				return rSet.getBoolean(columnIndex);
 			default :
 				Object obj = rSet.getObject(columnIndex);
 				
 				sysLog.info("Tipo dato sconosciuto: "
-						+"[column: "+ meta.getColumnName(columnIndex)
+						+"[column: "+ meta.getColumnLabel(columnIndex)
 						+", database type: "+ columnType
 						+ ", java: " + (obj!=null?obj.getClass().getName():"null") +"]");
 				
@@ -1264,7 +1266,7 @@ public class DataLink {
 		HashMap<String, Object> riga = new HashMap<String, Object>();
 		for (int i = 1; i <= cols.getColumnCount(); i++) {
 			
-			riga.put(cols.getColumnName(i), populateField(cols.getColumnType(i), i, rSet));
+			riga.put(cols.getColumnLabel(i), populateField(cols.getColumnType(i), i, rSet));
 			
 		}
 		return riga;
@@ -1280,7 +1282,7 @@ public class DataLink {
 		Object bean = c.newInstance();
 		HashMap<String, Object> riga = new HashMap<String, Object>();
 		for (int i = 1; i <= cols.getColumnCount(); i++) {
-			riga.put(TextUtils.dbToJava(cols.getColumnName(i)), populateField(cols.getColumnType(i), i, rSet));
+			riga.put(TextUtils.dbToJava(cols.getColumnLabel(i)), populateField(cols.getColumnType(i), i, rSet));
 		}
 		BeanUtils.populate(bean, riga);
 		return bean;
